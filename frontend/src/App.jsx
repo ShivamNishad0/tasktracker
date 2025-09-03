@@ -1,12 +1,12 @@
 import React,{useEffect,useState} from 'react'
 import Navbar from './components/Navbar'
-import { Route,Routes,useNavigate,Outlet, Navigate } from 'react-router-dom'
+import { Route,Routes,useNavigate,Outlet, Navigate, Link } from 'react-router-dom'
 import Layout from './components/Layout'
 import Login from './components/Login'
 import Signup from './components/SignUp'
 import Dashboard from './pages/Dashboard'
-import PendingPage from './pages/Dashboard'
-import CompletePage from './pages/Dashboard'
+import PendingPage from './pages/PendingPage'
+import CompletePage from './pages/CompletePage'
 import Profile from './components/Profile'
 
 

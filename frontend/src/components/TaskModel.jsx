@@ -25,7 +25,7 @@ const TaskModel = ({isOpen,onClose,taskToEdit,onSave,onLogout}) => {
             // completed = 'pending';
             // }
 
-            const normalized =taskToEdit.completed === true || taskToEdit.completed === 'completed' ? 'completed' : 'pending'
+            const normalized =taskToEdit.completed === true
             setTaskData({
                 ...DEFAULT_TASK,
                 title: taskToEdit.title || '',
@@ -48,7 +48,11 @@ const TaskModel = ({isOpen,onClose,taskToEdit,onSave,onLogout}) => {
 
     const handleChange =useCallback ((e) => {
         const {name,value}=e.target;
-        setTaskData(prev => ({...prev,[name]: value}))
+        // setTaskData(prev => ({...prev,[name]: value}))
+        setTaskData(prev => ({
+            ...prev,
+            [name]:name === "completed" ? value === "true" :value
+        }))
     },[])
 
     const getHeaders=useCallback(() => {
@@ -85,12 +89,16 @@ const TaskModel = ({isOpen,onClose,taskToEdit,onSave,onLogout}) => {
             const resp =await fetch(url, {
                 method: isEdit ?'PUT':'POST',
                 headers:getHeaders(),
-                body : JSON.stringify(taskData.completed),
+                body : JSON.stringify({
+                    ...taskData,
+                    completed : !!taskData.completed
+                }),
             });
 
             if(!resp.ok){
                 if(resp.status===401) return onLogout?.();
-                const err =await resp.json();
+                const err =await resp.text();
+                console.error("Backend error:", resp.status, err);
                 throw new Error(err.message || 'Failed to save task')
             }
             const saved =await resp.json();
@@ -180,8 +188,8 @@ const TaskModel = ({isOpen,onClose,taskToEdit,onSave,onLogout}) => {
 
                         </label >
                         <div className='flex gap-4'>
-                            {[{val:'completed', label:'Completed'},{val:'pending',label:'In Progress'}].map(({val,label}) => (
-                                <label key={val} className='flex items-center'>
+                            {[{val:true, label:'Completed'},{val:false,label:'In Progress'}].map(({val,label}) => (
+                                <label key={val.toString()} className='flex items-center'>
                                     <input type="radio" name="completed" value={val} checked={taskData.completed===val}
                                     onChange={handleChange} required className='h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded' />
                                     <span className='ml-2 text-sm text-gray-700'>{label}</span>

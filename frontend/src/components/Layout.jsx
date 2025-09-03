@@ -35,7 +35,7 @@ const Layout = ({user={} , onLogout }) => {
     } catch (err) {
       console.error(err);
       setError(err.message || 'Something went wrong');
-      if (err.response?.status === 401) {
+      if (err.response?.status === 401 && onLogout) {
         onLogout()
         
       }
@@ -142,7 +142,7 @@ const Layout = ({user={} , onLogout }) => {
                   </div>
                   <div className='relative pt-1'>
                     <div className='flex gap-1.5 items-center'>
-                      <div className='flex-1 h-2 sm:h-3 bg-purple-100 rounded-full. overflow-hidden'>
+                      <div className='flex-1 h-2 sm:h-3 bg-purple-100 rounded-full overflow-hidden'>
                         <div className='h-full bg-gradient-to-r from-fuchsia-500 to-purple-600 transition-all duration-500' style={{width:`${stats.completionPercentage}%`}}/>
 
 
@@ -162,8 +162,8 @@ const Layout = ({user={} , onLogout }) => {
                   Recent Activity
 
                 </h3>
-                <div className='space-y-2 sm:spce-y-3'>
-                  {tasks.slice(0,3).map((task) => {
+                <div className='space-y-2 sm:space-y-3'>
+                  {tasks.slice(0,3).map((task) => (
                     <div key={task._id || task.id} className='flex items-center justify-between p-2 sm:p-3 hover:bg-purple-50/50 rounded-lg transition-colors duration-200 border border-transparent hover:border-purple-100'>
                       <div className='flex-1 min-w-0'>
                         <p className='text-sm font-medium text-gray-700 break-words whitespace-normal'>
@@ -176,14 +176,14 @@ const Layout = ({user={} , onLogout }) => {
                         </p>
 
                       </div>
-                      <span className={`px-2 py-1 text-xs rounded-full shrink-0 ml-2 ${task.completed ? 'bg-green-100 text-fuchsia-700' : 'bg-fuchsia-100 text-fuchsia-700'}`}>
+                      <span className={`px-2 py-1 text-xs rounded-full shrink-0 ml-2 ${task.completed ? 'bg-green-100 text-green-700' : 'bg-fuchsia-100 text-fuchsia-700'}`}>
                         {task.completed ? "Done" : "Pending"}
 
 
                       </span>
 
                     </div>
-                  })}
+                  ))}
                   {tasks.length === 0 && (
                     <div className='text-center py-4 sm:py-6 px-2'>
                       <div className='w-12 h-12 sm:w-16 sm:h-16 mx-auto sm:mb-4 rounded-full bg-purple-100 flex items-center justify-center'>
@@ -195,7 +195,7 @@ const Layout = ({user={} , onLogout }) => {
                         No recent activity
 
                       </p>
-                      <p className='text-xs text-gray-400 mt-l'>
+                      <p className='text-xs text-gray-400 1'>
                         task will appear here
 
                       </p>

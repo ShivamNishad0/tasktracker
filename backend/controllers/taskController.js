@@ -2,6 +2,14 @@ import Task from "../middleware/taskModel.js";
 
 //create a task
 
+
+const normalizeCompleted = (val) => {
+    if (typeof val === 'boolean') return val;
+    if (typeof val === 'string') return ['true','yes','1','completed'].includes(val.toLowerCase());
+    if (typeof val === 'number') return val === 1;
+    return false;
+};
+
 export async function createTask(req, res) {
     try {
         const { title, description, priority ,dueDate, completed } = req.body;
@@ -10,7 +18,8 @@ export async function createTask(req, res) {
             description,
             priority,
             dueDate,
-            completed:completed==='yes' || completed===true,
+            // completed:completed==='yes' || completed===true,
+            completed: normalizeCompleted(completed),
             owner: req.user._id // Assuming req.user is set by auth middleware
         });
         const saved = await task.save();
@@ -51,9 +60,12 @@ export const getTaskById = async (req, res) => {
 export const updateTask = async (req, res) => {
     try {
         const data = {...req.body};
-        if (data.completed!==undefined) {
-            data.completed = data.completed==='yes' || data.completed===true;
+        if (data.completed !== undefined) {
+            data.completed = normalizeCompleted(data.completed);
         }
+        // if (data.completed!==undefined) {
+        //     data.completed = data.completed==='yes' || data.completed===true;
+        // }
         const updated=await Task.findOneAndUpdate(
             { _id: req.params.id, owner: req.user._id },
             data,
