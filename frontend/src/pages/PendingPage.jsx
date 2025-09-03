@@ -1,27 +1,32 @@
 import React, { useMemo, useState } from 'react'
 
 import { layoutClasses, SORT_OPTIONS } from '../assets/dummy'
-import { Clock, ListCheck, ListChecks } from 'lucide-react'
+import { Clock, Plus, Filter, ListChecks } from 'lucide-react'
 import { useOutletContext } from 'react-router-dom'
 import TaskItem from '../components/TaskItem'
 import TaskModel from '../components/TaskModel'
 
 
+const API_URL= 'http://localhost:4000/api/tasks'
 
 
 const PendingPage = () => {
 
-  const {task =[], refreshTasks} =useOutletContext();
+  const {tasks =[], refreshTasks} =useOutletContext();
   const [sortBy,setSortBy] = useState('newest')
   const [selectedTask,setSelectTask]= useState(null)
   const [showModel,setShowModel] =useState(false)
 
 
-  c
+  const getHeaders = () => {
+        const token =localStorage.getItem('token')
+        if(!token) throw new Error("No auth token fount")
+        return {'Content-Type': 'Application/json',Authorization: `Bearer ${token}`}
+    }
 
 
   const sortedPendingTasks=useMemo(() => {
-    const filtered=task.filter(
+    const filtered=tasks.filter(
       (t) => !t.completed || (typeof t.completed === 'string' && 
         t.completed.toLowerCase()==='no'
 
@@ -37,7 +42,7 @@ const PendingPage = () => {
     })
 
 
-  }, [task,sortBy])
+  }, [tasks,sortBy])
 
 
 
@@ -45,13 +50,13 @@ const PendingPage = () => {
     <div className={layoutClasses.container}>
       <div className={layoutClasses.headerWrapper}>
         <div>
-          <h1 className='text-2xl md:text-3xl font-bold text-gray-800 flex items-center gao-2'>
-            <ListChecks className='text-purple-500' />Pendint Task
+          <h1 className='text-2xl md:text-3xl font-bold text-gray-800 flex items-center gap-2'>
+            <ListChecks className='text-purple-500' />Pending Task
 
           </h1>
           <p className='text-sm text-gray-500 mt-1 ml-7'>
-            {sortedPendingTasks.lenght} task{sortedPendingTasks.lenght !== 1 &&'s'}{' '}
-            needing your attention
+            {sortedPendingTasks.length} task{sortedPendingTasks.length !== 1 &&'s'}{' '}
+             Needing your attention
 
           </p>
         </div>
@@ -101,7 +106,7 @@ const PendingPage = () => {
 
       </div>
       <div className='space-y-4'>
-        {sortedPendingTasks.lenght ===0 ?(
+        {sortedPendingTasks.length ===0 ?(
           <div className='max-w-xs mx-auto py-6'>
             <div className={layoutClasses.emptyIconBg}>
               <Clock className='w-8 h-8 text-purple-500' />
@@ -122,15 +127,15 @@ const PendingPage = () => {
 
           </div>
         ): (
-          sortedPendingTasks.map(task => (
-            <TaskItem key={task._id || task.id}
-            task={task}
-            showCompleteCheckBox onDelete={() => handleDelete(task._id || task.id)}
+          sortedPendingTasks.map(tasks => (
+            <TaskItem key={tasks._id }
+            task={tasks}
+            showCompleteCheckBox onDelete={() => handleDelete(tasks._id || tasks.id)}
             onToggleComplete={() => handleToggleComplete(
-              task._id || task.id,
+              tasks._id || tasks.id,
               t.completed
             )}
-            onEdit={() => {setSelectTask(task);}}
+            onEdit={() => {setSelectTask(tasks);setSelectTask(true);}} 
             onRefresh={refreshTasks}/>
           ))
         )}

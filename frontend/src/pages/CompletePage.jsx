@@ -1,27 +1,40 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { CT_CLASSES, SORT_OPTIONS } from '../assets/dummy'
 import { useOutlet, useOutletContext } from 'react-router-dom'
 import { CheckCircle2, Filter } from 'lucide-react';
-import TaskItem from '../components/TaskItem';
+import TaskItem from '../components/TaskItem'
+
 
 const CompletePage = () => {
-  const {tasks, refreshTasks} = useOutletContext();
+  const {tasks, refreshTasks} = useOutletContext()
   const [sortBy, setSortBy] = useState('newest')
+
+  console.log("Tasks from context:", tasks); 
+
   const sortedCompletedTask = useMemo(() => {
     return tasks
     .filter(task => [true,1,'yes'].includes(
-      typeof task.completed ==='string' ? task.completed.toLowercase()
+      typeof task.completed ==='string' ? task.completed.toLowerCase()
       :task.completed
     ))
+    // .filter(task => {
+    //     if (typeof task.completed === 'boolean') return task.completed;
+    //     if (typeof task.completed === 'string') {
+    //       return ['true', 'yes', '1', 'completed'].includes(task.completed.toLowerCase());
+    //     }
+    //     if (typeof task.completed === 'number') return task.completed === 1;
+    //     return false;
+    //   })
+    // .filter(task => task.completed === true)
     .sort((a,b) => {
       switch(sortBy) {
         case 'newest':
-          return new Date(b.createAt) - new Date(a.createAt)
+          return new Date(b.createdAt) - new Date(a.createdAt)
         case 'oldest':
-          return new Date(a.createAt) - new Date(b.createAt)
+          return new Date(a.createdAt) - new Date(b.createdAt)
         case 'priority': {
           const order ={high:3,medium:2,low:1};
-          return order[b.priority?.toLowercase()] - order[a.priority?.toLowercase]
+          return order[b.priority?.toLowerCase()] - order[a.priority?.toLowerCase()]
         }
         default:
           return 0
@@ -102,7 +115,7 @@ const CompletePage = () => {
         {sortedCompletedTask.length === 0 ? (
           <div className={CT_CLASSES.emptyState} >
             <div className={CT_CLASSES.emptyIconWrapper}>
-              <CheckCircle2 className='w-6 h-6 md:w8 md:h-8 text-purple-500' /> 
+              <CheckCircle2 className='w-6 h-6 md:w-8 md:h-8 text-purple-500' /> 
 
 
             </div>
