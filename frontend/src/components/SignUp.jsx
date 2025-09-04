@@ -40,7 +40,7 @@ const SignUp = ({ onSwitchMode }) => {
     };
 
     return (
-        <div className="max-h-screen flex items-center justify-center bg-gray-100">
+        <div className="min-h-screen w-screen flex items-center justify-center bg-gray-100">
             <div className='max-w-md w-full bg-white shadow-lg border border-purple-100 rounded-xl p-8'>
                 <div className='mb-6 text-center'>
                     <div className='w-16 h-16 bg-gradient-to-br from-fuchsia-500 to-purple-600 rounded-full mx-auto flex items-center justify-center mb-4'>
