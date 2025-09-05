@@ -13,7 +13,7 @@ import Sidebar from './Sidebar';
 const API_URL='http://localhost:4000'
 const Profile = ({setCurrentUser, onLogout}) => {
 
-    const [profile, setProfile]=useState({name: "", email: "" })
+const [profile, setProfile]=useState({name: "", email: "", phone: "" })
     const [passwords,setPasswords] =useState({current:"",new:"",confirm:""})
     const navigate=useNavigate()
 useEffect(() =>{
@@ -23,7 +23,7 @@ useEffect(() =>{
     .get(`${API_URL}/api/user/me`,{headers:{Authorization:`Bearer ${token}`}})
     .then(({data}) => {
         if(data.success)
-            setProfile({name: data.user.name,email:data.user.email})
+            setProfile({name: data.user.name,email:data.user.email, phone: data.user.phone || ""})
         else toast.error(data.message)
     })
     .catch(() => toast.error("Unable to load profile. "))
@@ -35,9 +35,9 @@ const saveProfile=async (e) => {
 
     try{
         const token = localStorage.getItem('token')
-        const {data} =await axios.put(
+    const {data} =await axios.put(
             `${API_URL}/api/user/profile`,
-            {name:profile.name,email:profile.email},
+            {name:profile.name,email:profile.email, phone: profile.phone},
             {headers:{Authorization:`Bearer ${token}`}}
         )
         if(data.success){
