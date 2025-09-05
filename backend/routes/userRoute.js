@@ -1,4 +1,7 @@
 import express from "express";
+import User from "../models/userModel.js";
+import { sendWhatsAppMessage } from "../utils/whatsapp.js";
+
 import {
   registerUser,
   loginUser,
