@@ -2,6 +2,7 @@ import userModel from "../models/userModel.js"
 import bcrypt from "bcrypt"
 import validator from "validator"
 import jwt from "jsonwebtoken"
+import { sendWhatsAppMessage } from "../utils/whatsapp.js";
 
 // Create JWT token
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
@@ -12,7 +13,7 @@ const createToken = (userId) =>
 
 // ======================= Register a user =======================
 export async function registerUser(req, res) {
-  const { name, email, password } = req.body;
+  const { name, email, password, phone } = req.body;
 
   if (!name || !email || !password) {
     return res
@@ -47,9 +48,16 @@ export async function registerUser(req, res) {
       name,
       email,
       password: hashedPassword,
+      phone
     });
 
     await newUser.save();
+
+    // Send WhatsApp thank you message if phone is provided
+    if (phone) {
+      const message = `Thank you for signing up for TaskTracker, ${name}! We're excited to have you on board.`;
+      sendWhatsAppMessage(phone, message);
+    }
 
     const token = createToken(newUser._id);
 
@@ -60,6 +68,7 @@ export async function registerUser(req, res) {
         id: newUser._id,
         name: newUser.name,
         email: newUser.email,
+        phone: newUser.phone
       },
     });
   } catch (error) {
@@ -98,7 +107,7 @@ export async function loginUser(req, res) {
     res.status(200).json({
       success: true,
       token,
-      user: { id: user._id, name: user.name, email: user.email },
+      user: { id: user._id, name: user.name, email: user.email, phone: user.phone },
     });
   } catch (error) {
     console.log(error);
@@ -124,7 +133,7 @@ export async function getUserProfile(req, res) {
 
 // ======================= Update user profile =======================
 export async function updateUserProfile(req, res) {
-  const { name, email } = req.body;
+  const { name, email, phone } = req.body;
 
   if (!name || !email) {
     return res
@@ -149,10 +158,13 @@ export async function updateUserProfile(req, res) {
         .json({ success: false, message: "Email already exists" });
     }
 
+    const updateData = { name, email };
+    if (phone !== undefined) updateData.phone = phone;
+
     const updatedUser = await userModel.findByIdAndUpdate(
       req.user.id,
-      { name, email },
-      { new: true, runValidators: true, select: "name email" }
+      updateData,
+      { new: true, runValidators: true, select: "name email phone" }
     );
 
     res.json({ success: true, user: updatedUser });
